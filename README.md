@@ -2,22 +2,29 @@
 
 This is a simple banking program implemented using Python and the Tkinter library for the graphical user interface (GUI). The program allows users to deposit and withdraw funds from their account and keeps track of the balance in a text file.
 
-Features
+**Features**
+
 Display current balance
 Deposit funds
 Withdraw funds
 Persistent balance storage using a text file
-Requirements
+
+**Requirements**
+
 Python 3.x
 Tkinter library (usually included with Python)
-Installation
+
+**Installation**
+
 Ensure you have Python installed. You can download it from python.org.
 Clone the repository or download the code.
 bash
 Copy code
 git clone https://github.com/yourusername/banking-program.git
 cd banking-program
-Usage
+
+**Usage**
+
 Run the program using the following command:
 
 bash
