@@ -1,4 +1,4 @@
-Banking Program
+**Banking Program**
 This is a simple banking program implemented using Python and the Tkinter library for the graphical user interface (GUI). The program allows users to deposit and withdraw funds from their account and keeps track of the balance in a text file.
 
 Features
