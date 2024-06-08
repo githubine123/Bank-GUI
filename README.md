@@ -39,6 +39,7 @@ Exit Button: Click to close the application.
 Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-License
+**License**
+
 This project is licensed under the MIT License.
 
