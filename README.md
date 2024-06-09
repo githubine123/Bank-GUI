@@ -29,7 +29,9 @@ Run the program using the following command:
 
 bash
 Copy code
+
 python main.py
+
 GUI Overview
 Balance Display: Shows the current balance in CHF.
 Amount Entry: Enter the amount to deposit or withdraw.
