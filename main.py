@@ -2,6 +2,12 @@ import sqlite3
 import tkinter as tk
 from tkinter import messagebox
 import hashlib
+import configparser
+
+# Read configuration
+config = configparser.ConfigParser()
+config.read('config.ini')
+admin_username = config['settings']['admin_username']
 
 # Create and initialize the database
 def init_db():
@@ -113,7 +119,7 @@ def main_screen(username):
     withdraw_button.pack(pady=5)
 
     # Only show the View Data button if the user is the admin
-    if username == "GBS2024":
+    if username == admin_username:
         view_data_button = tk.Button(root, text="View Data", command=view_data_screen)
         view_data_button.pack(pady=5)
 
