@@ -4,7 +4,7 @@ This is a simple banking program implemented using Python and the Tkinter librar
 
 **Features**
 
-Display current balance
+Display current balance,
 Deposit funds,
 Withdraw funds and
 Persistent balance storage using a text file
