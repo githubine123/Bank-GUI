@@ -1,41 +1,61 @@
-import os
+import sqlite3
 import tkinter as tk
 from tkinter import messagebox
 import hashlib
+
+# Create and initialize the database
+def init_db():
+    conn = sqlite3.connect('bank.db')
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            username TEXT PRIMARY KEY,
+            password TEXT NOT NULL
+        )
+    ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS balances (
+            username TEXT PRIMARY KEY,
+            balance REAL NOT NULL,
+            FOREIGN KEY (username) REFERENCES users (username)
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 def validate_login(username, password):
-    if os.path.exists("users.txt"):
-        with open("users.txt", "r") as file:
-            for line in file:
-                stored_username, stored_password = line.strip().split(',')
-                if stored_username == username and stored_password == hash_password(password):
-                    return True
-    return False
+    conn = sqlite3.connect('bank.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, hash_password(password)))
+    result = c.fetchone()
+    conn.close()
+    return result is not None
 
 def save_user(username, password):
-    with open("users.txt", "a") as file:
-        file.write(f"{username},{hash_password(password)}\n")
-    # Initialize balance for new user
-    with open(f"balance_{username}.txt", "w") as file:
-        file.write("0.0")
-
-def get_user_balance_filename(username):
-    return f"balance_{username}.txt"
+    conn = sqlite3.connect('bank.db')
+    c = conn.cursor()
+    c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hash_password(password)))
+    c.execute("INSERT INTO balances (username, balance) VALUES (?, ?)", (username, 0.0))
+    conn.commit()
+    conn.close()
 
 def save_balance(username, balance):
-    with open(get_user_balance_filename(username), "w") as file:
-        file.write(str(balance))
+    conn = sqlite3.connect('bank.db')
+    c = conn.cursor()
+    c.execute("UPDATE balances SET balance = ? WHERE username = ?", (balance, username))
+    conn.commit()
+    conn.close()
 
 def load_balance(username):
-    filename = get_user_balance_filename(username)
-    if os.path.exists(filename):
-        with open(filename, "r") as file:
-            return float(file.read())
-    else:
-        return 0.0
+    conn = sqlite3.connect('bank.db')
+    c = conn.cursor()
+    c.execute("SELECT balance FROM balances WHERE username = ?", (username,))
+    balance = c.fetchone()[0]
+    conn.close()
+    return balance
 
 def show_balance(balance_label, balance):
     balance_label.config(text=f"Your balance is {balance:.2f} CHF")
@@ -92,6 +112,11 @@ def main_screen(username):
     withdraw_button = tk.Button(root, text="Withdraw", command=lambda: withdraw(username, balance_label))
     withdraw_button.pack(pady=5)
 
+    # Only show the View Data button if the user is the admin
+    if username == "GBS2024":
+        view_data_button = tk.Button(root, text="View Data", command=view_data_screen)
+        view_data_button.pack(pady=5)
+
     exit_button = tk.Button(root, text="Exit", command=root.quit)
     exit_button.pack(pady=5)
 
@@ -131,5 +156,41 @@ def login_screen():
 
     login_window.mainloop()
 
+def view_data_screen():
+    view_window = tk.Tk()
+    view_window.title("View Database")
+
+    users_label = tk.Label(view_window, text="Users Table:")
+    users_label.pack(pady=5)
+
+    users_text = tk.Text(view_window, height=10, width=50)
+    users_text.pack(pady=5)
+
+    balances_label = tk.Label(view_window, text="Balances Table:")
+    balances_label.pack(pady=5)
+
+    balances_text = tk.Text(view_window, height=10, width=50)
+    balances_text.pack(pady=5)
+
+    conn = sqlite3.connect('bank.db')
+    c = conn.cursor()
+
+    users_text.insert(tk.END, "Username\tPassword\n")
+    c.execute("SELECT * FROM users")
+    users = c.fetchall()
+    for user in users:
+        users_text.insert(tk.END, f"{user[0]}\t{user[1]}\n")
+
+    balances_text.insert(tk.END, "Username\tBalance\n")
+    c.execute("SELECT * FROM balances")
+    balances = c.fetchall()
+    for balance in balances:
+        balances_text.insert(tk.END, f"{balance[0]}\t{balance[1]:.2f}\n")
+
+    conn.close()
+
+    view_window.mainloop()
+
 if __name__ == '__main__':
+    init_db()
     login_screen()
