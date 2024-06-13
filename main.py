@@ -2,12 +2,9 @@ import sqlite3
 import tkinter as tk
 from tkinter import messagebox
 import hashlib
-import configparser
 
-# Read configuration
-config = configparser.ConfigParser()
-config.read('config.ini')
-admin_username = config['settings']['admin_username']
+# Set the admin username directly in the code
+admin_username = 'GBS2024'
 
 # Create and initialize the database
 def init_db():
